@@ -1,4 +1,4 @@
-# WaterQualityDetector
+# Water Quality Detector
 
 This repository is a demo to detect the quality of water.
 
