@@ -5,13 +5,13 @@ import numpy as np
 
 
 class NeuralNetwork:
-    def __init__(self, inputnode, hidennode, outputnode, trained=False):
+    def __init__(self, inputnode, hidennode, outputnode, trained=False, iteration=0):
         self.inodes = inputnode
         self.hnodes = hidennode
         self.onodes = outputnode
         # 以上是设置神经网络节点的前期准备
         if trained:
-            self.load_model()
+            self.load_model(iteration)
         else:
             self.wih = np.random.normal(0.0, pow(self.hnodes, -0.5), (self.hnodes, self.inodes))
             self.who = np.random.normal(0.0, pow(self.hnodes, -0.5), (self.onodes, self.hnodes))
@@ -39,12 +39,13 @@ class NeuralNetwork:
             self.optimize_learning_rate('', step=iteration, total_steps=total_iteration)
 
     def predict(self, inputlist):  # 从此处开始定义测试过程
-        inputs = np.array(inputlist, ndmin=2).T
-        hiddeninputs = np.dot(self.wih, inputs)
-        hiddenoutputs = self.actfun(hiddeninputs)
-        finalinputs = np.dot(self.who, hiddenoutputs)
-        finaloutputs = self.actfun(finalinputs)
-        return finaloutputs
+        inputs = np.array(inputlist, ndmin=2).T.astype(float)
+        hiddeninputs = np.dot(self.wih, inputs).astype(float)
+        hiddenoutputs = self.actfun(hiddeninputs).astype(float)
+        finalinputs = np.dot(self.who, hiddenoutputs).astype(float)
+        finaloutputs = self.actfun(finalinputs).astype(float)
+
+        return np.argmax(finalinputs)
 
     def backward(self, targets, finaloutputs, hidenoutputs, inputs):
         oerror = targets - finaloutputs
@@ -56,8 +57,8 @@ class NeuralNetwork:
     def load_model(self, iteration):
         if exists("./model"):
             if exists(f"./model/wihNNmodel_{iteration}.npy") and exists(f"./model/whoNNmodel_{iteration}.npy"):
-                self.wih = np.load("./model/wihNNmodel.npy")
-                self.who = np.load("./model/whoNNmodel.npy")
+                self.wih = np.load(f"./model/wihNNmodel_{iteration}.npy")
+                self.who = np.load(f"./model/whoNNmodel_{iteration}.npy")
             else:
                 print("Failed to load model!\nPlease make sure whether the models exist!")
         else:
